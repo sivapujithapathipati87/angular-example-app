@@ -2,15 +2,10 @@ pipeline {
     agent any
     environment {
         SONAR_SCANNER='/opt/sonar-scanner' // Corrected variable name
+        DOCKER_CREDS = credentials('docker123')
+        DOCKER_IMAGE = 'sivapujitha'
     }
-    stages {
-        // clone the source code from git
-        stage('checkout') {
-            steps {
-                git 'https://github.com/sivapujithapathipati87/angular-example-app.git'
-            }
-        }
-        // sonar code quality check
+           // sonar code quality check
         stage('Sonar Analysis') {
             steps {
                 withSonarQubeEnv(credentialsId: 'sonarqube', installationName: 'sonarqube') {
@@ -34,18 +29,19 @@ pipeline {
          stage('Push to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker123', usernameVariable: 'sivapujitha', passwordVariable: 'Rakhi#123$')]) {
-                        sh 'docker login -u sivapujitha -p Rakhi#123$'
+                    withCredentials([usernamePassword(credentialsId: 'docker123', usernameVariable: 'DOCKER_CREDS_USR', passwordVariable: 'DOCKER_CREDS_PSW')]) {
+                        sh 'docker login -u $DOCKER_CREDS_USR -p $DOCKER_CREDS_PSW'
                     }
-                    sh 'docker tag angular sivapujitha/angular:latest'
-                    sh 'docker push sivapujitha/angular:latest'
+                    sh 'docker tag react $DOCKER_IMAGE/angular:latest'
+                    sh 'docker push $DOCKER_IMAGE/angular:latest'
+
                 }
             }
         }
         // run the container using docker image
         stage('Run') {
             steps {
-                sh 'docker run -d -p 3000:3000 --name angular angular'
+                sh 'docker run -d -p 4200:4200 --name angular angular'
             }
         }
         //trivy image scanner
