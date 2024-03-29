@@ -43,7 +43,7 @@ pipeline {
         // run the container using docker image
         stage('Run') {
             steps {
-                sh 'docker run -d -p 3000:3000 --name $IMAGE_NAME $IMAGE_NAME'
+                sh 'docker run -d -p 4200:4200 --name $IMAGE_NAME $IMAGE_NAME'
             }
         }
         //trivy image scanner
